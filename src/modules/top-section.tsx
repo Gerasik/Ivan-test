@@ -1,15 +1,21 @@
-import { useRef } from 'react';
-import { useState, useEffect, useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useContext } from 'react';
 import AppContext from '../common/controllers/paginationContext';
-import { changeSearchStringAction } from '../common/redux/actions/changeSearchString';
-import { AppState } from '../types/Interfaces';
+import {
+  selectSearchValue,
+  setSearchValue,
+} from '../common/redux/slice/searchSlice';
+import { useAppDispatch, useAppSelector } from '../hooks';
 
 const TopSection = () => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch();
-  const searchValue = useSelector((state: AppState) => state.value);
+  const dispatch = useAppDispatch();
+  const searchValue = useAppSelector(selectSearchValue);
+  console.log(
+    '🚀 ~ file: top-section.tsx:12 ~ TopSection ~ searchValue:',
+    searchValue
+  );
   // const [searchString, setSearchString] = useState('');
+
+  const [searchInputValue, setSearchInputValue] = useState(searchValue);
 
   const [isError, setIsError] = useState(false);
 
@@ -17,47 +23,43 @@ const TopSection = () => {
   // // const { setSearchStr } = useContext(ApiContext);
 
   const handleSearch = () => {
-    if (inputRef.current && inputRef.current.value) {
-      dispatch(changeSearchStringAction(inputRef.current.value));
-    } else {
-      dispatch(changeSearchStringAction(''));
-    }
+    dispatch(setSearchValue(searchInputValue));
   };
 
-  // Redux
-  useEffect(() => {
-    const value = localStorage.getItem('searchInputValue') || '';
-    dispatch(changeSearchStringAction(value));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const value = localStorage.getItem('searchInputValue') || '';
+  //   dispatch(setSearchValue(value));
+  // }, [dispatch]);
 
   if (isError) {
     throw new Error('Clicked on error button');
-  } else {
-    return (
-      <section className="top-section">
-        <input
-          ref={inputRef}
-          className="input"
-          type="text"
-          placeholder="Search here..."
-          value={searchValue}
-        />
-        <button
-          className="button"
-          onClick={(event) => {
-            event.preventDefault();
-            setPage(1);
-            handleSearch();
-          }}
-        >
-          Search
-        </button>
-        <button className="button" onClick={() => setIsError(true)}>
-          Err btn
-        </button>
-      </section>
-    );
   }
+
+  return (
+    <section className="top-section">
+      <input
+        className="input"
+        type="text"
+        placeholder="Search here..."
+        value={searchInputValue}
+        onChange={(e) => {
+          setSearchInputValue(e.target.value);
+        }}
+      />
+      <button
+        className="button"
+        onClick={() => {
+          setPage(1);
+          handleSearch();
+        }}
+      >
+        Search
+      </button>
+      <button className="button" onClick={() => setIsError(true)}>
+        Err btn
+      </button>
+    </section>
+  );
 };
 
 export default TopSection;

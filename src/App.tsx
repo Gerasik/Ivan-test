@@ -1,16 +1,17 @@
 import { useEffect, useContext, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getFromApi } from './common/API/apiFunc';
 import ApiContext from './common/controllers/apiContext';
 import AppContext from './common/controllers/paginationContext';
-import { changeSearchStringAction } from './common/redux/actions/changeSearchString';
+
 import BottomSection from './modules/bottom section/bottom-section';
 import TopSection from './modules/top-section';
+import { setSearchValue } from './common/redux/slice/searchSlice';
+import { useAppDispatch } from './hooks';
 
 const App = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { limit, page, setTotalItems } = useContext(AppContext);
   const {
@@ -59,7 +60,7 @@ const App = () => {
   useEffect(() => {
     const localStr = localStorage.getItem('searchInputValue');
 
-    if (localStr) dispatch(changeSearchStringAction(localStr));
+    if (localStr) dispatch(setSearchValue(localStr));
     // handleSearch();
   }, [handleSearch, dispatch]);
 
